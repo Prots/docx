@@ -63,6 +63,18 @@ func TestReplace(t *testing.T) {
 	}
 }
 
+func TestReplaceImage(t *testing.T) {
+	d := loadFile(testFile)
+	err := d.ReplaceImage("word/media/image1.jpg", "lion.jpeg")
+	if err != nil {
+		t.Error("Error during image replace preparation", err)
+	}
+	err = d.WriteToFile(testFileResult)
+	if err != nil {
+		t.Error("Error during image replace", err)
+	}
+}
+
 func TestReplaceLink(t *testing.T) {
 	d := loadFile(testFile)
 	d.ReplaceLink("http://example.com/", "https://github.com/nguyenthenguyen/docx", -1)

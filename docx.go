@@ -52,6 +52,7 @@ type ReplaceDocx struct {
 	links     string
 	headers   map[string]string
 	footers   map[string]string
+	images 	  map[string]*os.File
 }
 
 func (r *ReplaceDocx) Editable() *Docx {
@@ -61,6 +62,7 @@ func (r *ReplaceDocx) Editable() *Docx {
 		links:   r.links,
 		headers: r.headers,
 		footers: r.footers,
+		images:  make(map[string]*os.File, 0),
 	}
 }
 
@@ -74,7 +76,7 @@ type Docx struct {
 	links   string
 	headers map[string]string
 	footers map[string]string
-	images map[string]*os.File
+	images  map[string]*os.File
 }
 
 func (d *Docx) GetContent() string {
