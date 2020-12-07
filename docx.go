@@ -74,6 +74,7 @@ type Docx struct {
 	links   string
 	headers map[string]string
 	footers map[string]string
+	images map[string]*os.File
 }
 
 func (d *Docx) GetContent() string {
@@ -124,6 +125,16 @@ func (d *Docx) ReplaceFooter(oldString string, newString string) (err error) {
 	return replaceHeaderFooter(d.footers, oldString, newString)
 }
 
+// Please unzip Docx file and get images path and name before.
+func (d *Docx) ReplaceImage(oldZipImageName string, pathToNewImage string) (err error) {
+	file, err := os.Open(pathToNewImage)
+	if err != nil {
+		return err
+	}
+	d.images[oldZipImageName] = file
+	return nil
+}
+
 func (d *Docx) WriteToFile(path string) (err error) {
 	var target *os.File
 	target, err = os.Create(path)
@@ -157,6 +168,8 @@ func (d *Docx) Write(ioWriter io.Writer) (err error) {
 			writer.Write([]byte(d.headers[file.Name]))
 		} else if strings.Contains(file.Name, "footer") && d.footers[file.Name] != "" {
 			writer.Write([]byte(d.footers[file.Name]))
+		} else if image, ok := d.images[file.Name]; ok {
+			writer.Write(streamToByte(image))
 		} else {
 			writer.Write(streamToByte(readCloser))
 		}
