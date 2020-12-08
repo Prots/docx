@@ -52,7 +52,7 @@ type ReplaceDocx struct {
 	links     string
 	headers   map[string]string
 	footers   map[string]string
-	images 	  map[string]*os.File
+	images 	  map[string][]byte
 }
 
 func (r *ReplaceDocx) Editable() *Docx {
@@ -62,7 +62,7 @@ func (r *ReplaceDocx) Editable() *Docx {
 		links:   r.links,
 		headers: r.headers,
 		footers: r.footers,
-		images:  make(map[string]*os.File, 0),
+		images:  make(map[string][]byte, 0),
 	}
 }
 
@@ -76,7 +76,7 @@ type Docx struct {
 	links   string
 	headers map[string]string
 	footers map[string]string
-	images  map[string]*os.File
+	images  map[string][]byte
 }
 
 func (d *Docx) GetContent() string {
@@ -133,7 +133,13 @@ func (d *Docx) ReplaceImage(oldZipImageName string, pathToNewImage string) (err 
 	if err != nil {
 		return err
 	}
-	d.images[oldZipImageName] = file
+	d.images[oldZipImageName] = streamToByte(file)
+	return nil
+}
+
+// Please unzip Docx file and get images path and name before.
+func (d *Docx) ReplaceImageBytes(oldZipImageName string, newImage []byte) (err error) {
+	d.images[oldZipImageName] = newImage
 	return nil
 }
 
@@ -171,7 +177,7 @@ func (d *Docx) Write(ioWriter io.Writer) (err error) {
 		} else if strings.Contains(file.Name, "footer") && d.footers[file.Name] != "" {
 			writer.Write([]byte(d.footers[file.Name]))
 		} else if image, ok := d.images[file.Name]; ok {
-			writer.Write(streamToByte(image))
+			writer.Write(image)
 		} else {
 			writer.Write(streamToByte(readCloser))
 		}

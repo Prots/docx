@@ -75,6 +75,23 @@ func TestReplaceImage(t *testing.T) {
 	}
 }
 
+func TestReplaceImageBytes(t *testing.T) {
+	d := loadFile(testFile)
+	img, err := ioutil.ReadFile("lion.jpeg")
+	if err != nil {
+		t.Error("Error during image replace preparation", err)
+	}
+
+	err = d.ReplaceImageBytes("word/media/image1.jpg", img)
+	if err != nil {
+		t.Error("Error during image replace preparation", err)
+	}
+	err = d.WriteToFile(testFileResult)
+	if err != nil {
+		t.Error("Error during image replace", err)
+	}
+}
+
 func TestReplaceLink(t *testing.T) {
 	d := loadFile(testFile)
 	d.ReplaceLink("http://example.com/", "https://github.com/nguyenthenguyen/docx", -1)
